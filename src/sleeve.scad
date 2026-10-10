@@ -1,8 +1,11 @@
-$vpt = [0, -15, 7.5];   // viewpoint target / translation
 $fn = 64;   // finer display resolution
 
 // Door Protective Sleeve
-// Stage 1: 15 mm fit-test specimen of the U-shaped sleeve
+// Stage 2: finished 65 mm sleeve (the default).  The cross-section
+// passed a physical fit test as a 15 mm specimen and is unchanged.
+//
+// This file is the source of truth: opening it shows the current
+// approved design.  See HEIGHT for the 15 mm test configuration.
 
 // ============================================================
 // LAYOUT
@@ -73,15 +76,16 @@ grip_length = grip_surface_length;
 // ============================================================
 // HEIGHT
 //
-// The fit-test specimen is printed first.  Override sleeve_height
-// for the finished part once the profile is verified, e.g.
-//   openscad -D sleeve_height=65 ...
+// The default is the finished part.  The 15 mm fit-test specimen
+// (printed and passed) is the same cross-section, and is selected
+// explicitly when it is needed:
+//   openscad -D sleeve_height=prototype_height ...
 // ============================================================
 
 prototype_height = 15.0;
 finished_height  = 65.0;
 
-sleeve_height = prototype_height;
+sleeve_height = finished_height;
 
 
 // ============================================================
@@ -285,10 +289,31 @@ echo(str("grip face covers ", grip_length, " of the ",
 
 
 // ============================================================
-// MODEL
+// DEFAULT VIEW
+//
+// Isometric, framed on whatever is being built, so the GUI shows
+// the whole part on every preview and render.  An explicit
+// --camera on the command line takes precedence over these.
 // ============================================================
 
-sleeve();
+$vpr = [55, 0, 35];
+$vpt = [(tongue_x_out - grip_wall) / 2,
+        (bridge_thickness - grip_length) / 2,
+        sleeve_height / 2];
+$vpd = 3.0 * norm([outer_width, outer_depth, sleeve_height]);
+
+
+// ============================================================
+// MODEL
+//
+// src/sleeve-drawing.scad includes this file and sets
+// show_model = false, so it can draw its own views instead.
+// ============================================================
+
+show_model = true;
+
+if (show_model)
+    sleeve();
 
 // aluminum_dummy();
 // lock_face_dummy();
